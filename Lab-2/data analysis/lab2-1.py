@@ -217,7 +217,7 @@ def F_num_method_first(h):
 # guess = float(input("Guess the h value for forced convection "))
 guess = 7
 
-for1_ans = so.least_squares(F_num_method_first, guess)
+for1_ans = so.least_squares(F_num_method_first, guess, bounds = [guess-2, guess+2])
 print(for1_ans.x)
 
 def F_num_method_final(h):
