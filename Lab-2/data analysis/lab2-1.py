@@ -6,6 +6,7 @@ import scipy.stats as ss
 
 
 file_name = "/Users/Nguyen/Documents/ECH_145/Lab-2/data analysis/Lab2Data.xlsx"
+# file_name = "/Users/binhco/Documents/GitHub/ECH145/Lab-2/data analysis/Lab2Data.xlsx"
 
 ### Natural Convection
 rawfile = pd.read_excel(file_name, "Natural Convection")
@@ -163,7 +164,7 @@ print("Analytical Solution for Forced Convection is " + str(round(analytical_for
 
 #Forced Convection
 alfa = k / (rho * Cp)
-dt = 0.01
+dt = 0.05
 dr = diameter / (2 * 10)
 
 beta = mass * Cp/dt
@@ -249,85 +250,85 @@ plt.plot(num_for1_time, for1_T[:, -1], 'k', ls='--', lw=2, alpha=0.5, label='FDM
 
 
 ### Natural Convection
-# alfa = k / (rho * Cp)
-# dt = 0.5
-# dr = diameter/ (2 * 5)
-# beta = mass * Cp / dt
+alfa = k / (rho * Cp)
+dt = 0.05
+dr = diameter/ (2 * 4)
+beta = mass * Cp / dt
 
-# print("s is equal to " + str(s))
-# if (s>0.5):
-    # print("bad bad change your dr dt")
+print("s is equal to " + str(s))
+if (s>0.5):
+    print("bad bad change your dr dt")
 
-# num_nat_time = np.arange(0, int(nat_time[-1]), dt)
+num_nat_time = np.arange(0, int(nat_time[-1]), dt)
 
-# nat_T = np.zeros((len(num_nat_time), int(diameter/(2 * dr))))
-# nat_T[0, :] = nat_center_temp[0]
+nat_T = np.zeros((len(num_nat_time), int(diameter/(2 * dr))))
+nat_T[0, :] = nat_center_temp[0]
 
-# def N_sq_diff(time):
-    # exp_idx = np.where(nat_time == time)[0]
-    # idx = np.where(num_nat_time == time)[0]
-    # numerical = nat_T[idx, -1]
-    # experimental = nat_center_temp[exp_idx]
-    # diff = numerical - experimental
-    # return diff**2
+def N_sq_diff(time):
+    exp_idx = np.where(nat_time == time)[0]
+    idx = np.where(num_nat_time == time)[0]
+    numerical = nat_T[idx, -1]
+    experimental = nat_center_temp[exp_idx]
+    diff = numerical - experimental
+    return diff**2
 
-# def N_num_method_first(h):
-    # alfa = k / (rho * Cp)
-    # dt = 0.05
-    # dr = diameter/(2 * 5)
-    # beta = mass * Cp/dt
-    # s = alfa * dt / (dr**2)
-    # if s > 0.5:
-        # print("Bad, change your dt and dr")
+def N_num_method_first(h):
+    alfa = k / (rho * Cp)
+    dt = 0.05
+    dr = diameter/(2 * 4)
+    beta = mass * Cp/dt
+    s = alfa * dt / (dr**2)
+    if s > 0.5:
+        print("Bad, change your dt and dr")
 
-    # for m in range(1, len(num_nat_time)):
-        # for i in range(1, int(diameter / (2 * dr)) - 1):
-            # a_i = s - s/(2*i)
-            # b_i = 1 - 2*s
-            # c_i = s + s/(2*i)
-            # nat_T[m, i] = a_i * nat_T[m-1, i-1] + b_i * nat_T[m-1, i] + c_i * nat_T[m-1, i+1]
-            # nat_T[m, 0] = nat_T[m, 1]
-            # nat_T[m, -1] = ((beta * nat_T[m-1, -1]) + (h * sur_area * nat_T_inf)) / (beta + (h *
-                                                                                               # sur_area))           
+    for m in range(1, len(num_nat_time)):
+        for i in range(1, int(diameter / (2 * dr)) - 1):
+            a_i = s - s/(2*i)
+            b_i = 1 - 2*s
+            c_i = s + s/(2*i)
+            nat_T[m, i] = a_i * nat_T[m-1, i-1] + b_i * nat_T[m-1, i] + c_i * nat_T[m-1, i+1]
+            nat_T[m, 0] = nat_T[m, 1]
+            nat_T[m, -1] = ((beta * nat_T[m-1, -1]) + (h * sur_area * nat_T_inf)) / (beta + (h *
+                                                                                               sur_area))           
+    print("Completed Solution")
+    residuals = []
+    for i in range(len(nat_time)):
+        res = N_sq_diff(nat_time[i])
+        residuals.append(res)
+    residuals = np.array(residuals[:-1], dtype = float)
+    return float(sum(residuals))
+
+# guess = float(input("Guess the h value for Natural Convection: "))
+
+guess = 45
+
+num_ans = so.least_squares(N_num_method_first, guess)
+print(num_ans.x)
+
+def N_num_method_final(h):
+    alfa = k / (rho * Cp)
+    dt = 0.05
+    dr = diameter/(2 * 4)
+    beta = mass * Cp/dt
+    s = alfa * dt / (dr**2)
+    if s > 0.5:
+        print("Bad, change your dt and dr")
+
+    for m in range(1, len(num_nat_time)):
+        for i in range(1, int(diameter / (2 * dr)) - 1):
+            a_i = s - s/(2*i)
+            b_i = 1 - 2*s
+            c_i = s + s/(2*i)
+            nat_T[m, i] = a_i * nat_T[m-1, i-1] + b_i * nat_T[m-1, i] + c_i * nat_T[m-1, i+1]
+            nat_T[m, 0] = nat_T[m, 1]
+            nat_T[m, -1] = ((beta * nat_T[m-1, -1]) + (h * sur_area * nat_T_inf)) / (beta + (h *
+                                                                                               sur_area))           
     # print("Completed Solution")
-    # residuals = []
-    # for i in range(len(nat_time)):
-        # res = N_sq_diff(nat_time[i])
-        # residuals.append(res)
-    # residuals = np.array(residuals[:-1], dtype = float)
-    # return float(sum(residuals))
+    return nat_T
 
-# # guess = float(input("Guess the h value for Natural Convection: "))
+nat_T = N_num_method_final(num_ans.x)
 
-# guess = 45
-
-# num_ans = so.least_squares(N_num_method_first, guess)
-# print(num_ans.x)
-
-# def N_num_method_final(h):
-    # alfa = k / (rho * Cp)
-    # dt = 0.05
-    # dr = diameter/(2 * 5)
-    # beta = mass * Cp/dt
-    # s = alfa * dt / (dr**2)
-    # if s > 0.5:
-        # print("Bad, change your dt and dr")
-
-    # for m in range(1, len(num_nat_time)):
-        # for i in range(1, int(diameter / (2 * dr)) - 1):
-            # a_i = s - s/(2*i)
-            # b_i = 1 - 2*s
-            # c_i = s + s/(2*i)
-            # nat_T[m, i] = a_i * nat_T[m-1, i-1] + b_i * nat_T[m-1, i] + c_i * nat_T[m-1, i+1]
-            # nat_T[m, 0] = nat_T[m, 1]
-            # nat_T[m, -1] = ((beta * nat_T[m-1, -1]) + (h * sur_area * nat_T_inf)) / (beta + (h *
-                                                                                               # sur_area))           
-    # # print("Completed Solution")
-    # return nat_T
-
-# nat_T = N_num_method_final(num_ans.x)
-
-# plt.plot(num_nat_time, nat_T[:, -1], 'r', ls='--', lw=2, alpha=0.5, label='FDM Natural Convection, Surface')
+plt.plot(num_nat_time, nat_T[:, -1], 'r', ls='--', lw=2, alpha=0.5, label='FDM Natural Convection, Surface')
 
 
 
