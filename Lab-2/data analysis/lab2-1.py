@@ -5,8 +5,8 @@ import scipy.optimize as so
 import scipy.stats as ss
 
 
-file_name = "/Users/Nguyen/Documents/ECH_145/Lab-2/data analysis/Lab2Data.xlsx"
-# file_name = "/Users/binhco/Documents/GitHub/ECH145/Lab-2/data analysis/Lab2Data.xlsx"
+# file_name = "/Users/Nguyen/Documents/ECH_145/Lab-2/data analysis/Lab2Data.xlsx"
+file_name = "/Users/binhco/Documents/GitHub/ECH145/Lab-2/data analysis/Lab2Data.xlsx"
 
 ### Natural Convection
 rawfile = pd.read_excel(file_name, "Natural Convection")
@@ -165,14 +165,13 @@ print("Analytical Solution for Forced Convection is " + str(round(analytical_for
 #Forced Convection
 alfa = k / (rho * Cp)
 dt = 0.05
-dr = diameter / (2 * 10)
-
-beta = mass * Cp/dt
-
-s = alfa * dt / (dr**2)
+dr = diameter/ (2 * 4)
+beta = mass * Cp / dt
+s = alfa * dt / dr**2
 print("s is equal to " + str(s))
 if (s>0.5):
     print("bad bad change your dr dt")
+
 
 num_for1_time = np.arange(0, int(for1_time[-1]), dt)
 
@@ -188,16 +187,6 @@ def F_sq_diff(time):
     return diff**2
 
 def F_num_method_first(h):
-    alfa = k / (rho * Cp)
-    dt = 0.05
-    dr = diameter / (2 * 4)
-
-    beta = mass * Cp/dt
-
-    s = alfa * dt / (dr**2)
-    if s > 0.5:
-        print("Bad, change your dt and dr")
-
     for m in range(1, len(num_for1_time)):
         for i in range(1, int(diameter / (2 * dr)) - 1):
             a_i = s - s/(2*i)
@@ -216,19 +205,12 @@ def F_num_method_first(h):
     return float(sum(residuals))
 
 # guess = float(input("Guess the h value for forced convection "))
-guess = 7
+guess = 27
 
 for1_ans = so.least_squares(F_num_method_first, guess, bounds = [guess-2, guess+2])
 print(for1_ans.x)
 
 def F_num_method_final(h):
-    alfa = k / (rho * Cp)
-    dt = 0.05
-    dr = diameter/(2 * 4)
-    beta = mass * Cp/dt
-    s = alfa * dt / (dr**2)
-    if s > 0.5:
-        print("bad bad change your dr dt")
     for m in range(1, len(num_for1_time)):
         for i in range(1, int(diameter/(2 * dr))-1):
             a_i = s - s/(2*i)
@@ -254,7 +236,7 @@ alfa = k / (rho * Cp)
 dt = 0.05
 dr = diameter/ (2 * 4)
 beta = mass * Cp / dt
-
+s = alfa * dt / dr**2
 print("s is equal to " + str(s))
 if (s>0.5):
     print("bad bad change your dr dt")
@@ -273,14 +255,6 @@ def N_sq_diff(time):
     return diff**2
 
 def N_num_method_first(h):
-    alfa = k / (rho * Cp)
-    dt = 0.05
-    dr = diameter/(2 * 4)
-    beta = mass * Cp/dt
-    s = alfa * dt / (dr**2)
-    if s > 0.5:
-        print("Bad, change your dt and dr")
-
     for m in range(1, len(num_nat_time)):
         for i in range(1, int(diameter / (2 * dr)) - 1):
             a_i = s - s/(2*i)
@@ -300,20 +274,12 @@ def N_num_method_first(h):
 
 # guess = float(input("Guess the h value for Natural Convection: "))
 
-guess = 45
+guess = 11
 
-num_ans = so.least_squares(N_num_method_first, guess)
+num_ans = so.least_squares(N_num_method_first, guess, bounds = [guess-2, guess+2])
 print(num_ans.x)
 
 def N_num_method_final(h):
-    alfa = k / (rho * Cp)
-    dt = 0.05
-    dr = diameter/(2 * 4)
-    beta = mass * Cp/dt
-    s = alfa * dt / (dr**2)
-    if s > 0.5:
-        print("Bad, change your dt and dr")
-
     for m in range(1, len(num_nat_time)):
         for i in range(1, int(diameter / (2 * dr)) - 1):
             a_i = s - s/(2*i)
@@ -335,7 +301,6 @@ plt.plot(num_nat_time, nat_T[:, -1], 'r', ls='--', lw=2, alpha=0.5, label='FDM N
 step = 20
 new_for1_time = []
 new_for1_center_temp = []
-
 for i in range(int(len(for1_time)/step)):
     ft = for1_time[i * step]
     new_for1_time.append(ft)
@@ -343,10 +308,10 @@ for i in range(int(len(for1_time)/step)):
     new_for1_center_temp.append(ftemp)
 
 
+
 step = 20
 new_nat_time = []
 new_nat_center_temp = []
-
 for i in range(int(len(nat_time)/step)):
     ft = nat_time[i * step]
     new_nat_time.append(ft)
