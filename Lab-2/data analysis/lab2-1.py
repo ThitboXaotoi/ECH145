@@ -256,7 +256,7 @@ for1_heat_transfer_tot = numerical_for1_h * np.pi * diameter * length * si.simps
                                                                             for1_T_inf,
                                                                             num_for1_time)
 
-print("Total Heat Transfer is " + str(round(for1_heat_transfer_tot, 2)))
+print("Total Heat Transfer is " + str(round(for1_heat_transfer_tot, 2)) + "Joules")
 
 plt.figure(1)
 plt.plot(num_for1_time, for1_T[:, -1], 'k', ls='-', lw=2, alpha=0.5, label='Numerical Forced Convection Solution')
@@ -331,7 +331,7 @@ nat_heat_transfer_tot = numerical_nat_h * np.pi * diameter * length * si.simps(n
                                                                             nat_T_inf,
                                                                             num_nat_time)
 
-print("Total Heat Transfer is " + str(round(nat_heat_transfer_tot, 2)))
+print("Total Heat Transfer is " + str(round(nat_heat_transfer_tot, 2)) + "Joules")
 
 plt.plot(num_nat_time, nat_T[:, -1], 'r', ls='-', lw=2, alpha=0.5, label='Numerical Natural Convection Solution')
 
