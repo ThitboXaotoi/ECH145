@@ -1,3 +1,8 @@
+"""
+Credit to Toby Mea for a lot of stuffs in this code especially for the minimization of Numerical
+Solution.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -256,7 +261,7 @@ for1_heat_transfer_tot = numerical_for1_h * np.pi * diameter * length * si.simps
                                                                             for1_T_inf,
                                                                             num_for1_time)
 
-print("Total Heat Transfer is " + str(round(for1_heat_transfer_tot, 2)) + "Joules")
+print("Total Heat Transfer is " + str(round(for1_heat_transfer_tot, 2)) + " Joules")
 
 plt.figure(1)
 plt.plot(num_for1_time, for1_T[:, -1], 'k', ls='-', lw=2, alpha=0.5, label='Numerical Forced Convection Solution')
@@ -331,7 +336,15 @@ nat_heat_transfer_tot = numerical_nat_h * np.pi * diameter * length * si.simps(n
                                                                             nat_T_inf,
                                                                             num_nat_time)
 
-print("Total Heat Transfer is " + str(round(nat_heat_transfer_tot, 2)) + "Joules")
+print("Total Heat Transfer is " + str(round(nat_heat_transfer_tot, 2)) + " Joules")
+
+def cooling_to_point_1(t):
+    return (0.1 / (nat_T_init - nat_T_inf) - np.exp(-numerical_nat_h * np.pi * diameter * length * t /
+                                                    (mass * Cp)))
+
+cooling_time = float(so.fsolve(cooling_to_point_1, 0.01))
+
+print(f"It takes {cooling_time} seconds to cool the cylinder to within 0.1 deg C")
 
 plt.plot(num_nat_time, nat_T[:, -1], 'r', ls='-', lw=2, alpha=0.5, label='Numerical Natural Convection Solution')
 
