@@ -5,8 +5,8 @@ import scipy.optimize as so
 import scipy.stats as ss
 
 
-# file_name = "/Users/Nguyen/Documents/ECH_145/Lab-2/data analysis/Lab2Data.xlsx"
-file_name = "/Users/binhco/Documents/GitHub/ECH145/Lab-2/data analysis/Lab2Data.xlsx"
+file_name = "/Users/Nguyen/Documents/ECH_145/Lab-2/data analysis/Lab2Data.xlsx"
+# file_name = "/Users/binhco/Documents/GitHub/ECH145/Lab-2/data analysis/Lab2Data.xlsx"
 
 ### Natural Convection
 rawfile = pd.read_excel(file_name, "Natural Convection")
@@ -46,29 +46,13 @@ for1_T_inf = np.mean(for1_ambient_temp)
 for1_T_init = for1_center_temp[0]
 
 
-### Forced Convection 2
-rawfile = pd.read_excel(file_name, "Forced Convection backup 1")
-raw_time = np.array(rawfile)[2:, 2]
-raw_time = np.array(raw_time, dtype=float)
-raw_temps = np.array(rawfile)[2:, 3:5]
-raw_temps = np.array(raw_temps, dtype=float)
-
-raw_ambient_temp = raw_temps[:, 1]
-raw_center_temp = raw_temps[:, 0]
-
-i_start = np.argmax(raw_center_temp)
-for2_time = np.array(raw_time[i_start:]) - np.array(raw_time[i_start])
-for2_ambient_temp = np.array(raw_ambient_temp[i_start:])
-for2_center_temp = np.array(raw_center_temp[i_start:])
-
-for2_T_inf = np.mean(for2_ambient_temp)
-for2_T_init = for2_center_temp[0]
-
 ### Parameters
 rho = 2700 #kg/m**3
 diameter = 0.02536 #m
 length = 0.06018
 
+# diameter = 0.02537 #m
+# length = 0.06019
 volume = np.pi * diameter**2 * length / 4
 sur_area = np.pi * diameter * length
 mass = rho * volume
@@ -76,16 +60,41 @@ mass = rho * volume
 Cp = 900 #J/kgK
 k = 170 #W/mK
 
+g = 9.81 #m/s**2
+
+
 #air
 nu = 15.15E-6 #m**2/s
 k_air = 25.95E-3 
+thermal_expansion = 3.43E-3
+Pr = 0.707
 
 
+"""
+---------------------
+Empirical Correlation
 
-###Empirical Correlation
+"""
+# Natural Convection
 
+Gr = (g * thermal_expansion * (np.mean(nat_center_temp) - nat_T_inf) * diameter**3) / (nu**2)
+
+def Nusselt(Nu):
+    return Nu * np.exp(-2/Nu) - 0.6*((diameter/length)*Gr*Pr)**0.25
+
+Nu = so.fsolve(Nusselt, 0.01)
+
+h_nat_emp = Nu * k_air/diameter
+h_nat_emp_err = h_nat_emp * ((0.00001/diameter) + (0.00001/diameter + 0.00001/length +
+                                                    0.05/nat_T_inf + 0.00001/diameter)*0.25)
+
+
+print("The Empirical Correlation gives an h of " + str(round(float(h_nat_emp), 2)) + " ± " +
+      str(round(float(h_nat_emp_err), 2)))
+
+
+# Forced Convection
 velocity = 1.17 #m/s
-Pr = 0.7296
 
 Re = velocity * diameter / nu
 
@@ -95,27 +104,34 @@ if Re > 4:
             if Re > 40000:
                 if Re > 400000:
                     C = 0.027
-                    n = 0.805
+                    m = 0.805
             else:
                 C = 0.193
-                n = 0.618
+                m = 0.618
         else:
             C = 0.683
-            n = 0.466
+            m = 0.466
     else:
         C = 0.911
-        n = 0.385
+        m = 0.385
 else:
     C = 0.989
     m = 0.330
 
-h_empirical = k_air + C * (Re**n) * (Pr**(1/3)) / diameter
-h_empirical_err = h_empirical * ((((0.01/velocity) + (2 * 0.00001/diameter)) * n) + (0.00001/diameter))
+h_empirical = k_air * C * (Re**m) * (Pr**(1/3)) / diameter
+h_empirical_err = h_empirical * ((((0.01/velocity)+ (0.00001/diameter)) * m/(Re**m)) +
+                                 (0.00001/diameter))
 
 print("The Empirical Correlation gives an h of " + str(round(h_empirical, 2)) + " ± " +
       str(round(h_empirical_err, 2)))
 
-###Analytic Solution
+
+"""
+---------------------
+Analytic Solution
+
+"""
+
 
 nat_LHS = np.log((nat_center_temp - nat_T_inf) / (nat_T_init - nat_T_inf))
 plt.figure(0)
@@ -160,7 +176,13 @@ print("Analytical Solution for Forced Convection is " + str(round(analytical_for
       str(round(analytical_for1_h_err, 2)))
 
 
-###Numerical Solution
+
+"""
+---------------------
+Numerical Solution
+
+"""
+
 
 #Forced Convection
 alfa = k / (rho * Cp)
@@ -208,7 +230,8 @@ def F_num_method_first(h):
 guess = 27
 
 for1_ans = so.least_squares(F_num_method_first, guess, bounds = [guess-2, guess+2])
-print(for1_ans.x)
+print("Numerical Solution for Forced Convection is " + str(round(float(for1_ans.x), 2)) + " ± " +
+      str(0.0119))
 
 def F_num_method_final(h):
     for m in range(1, len(num_for1_time)):
@@ -227,8 +250,7 @@ def F_num_method_final(h):
 for1_T = F_num_method_final(for1_ans.x)
 
 plt.figure(1)
-plt.plot(num_for1_time, for1_T[:, -1], 'k', ls='--', lw=2, alpha=0.5, label='FDM Forced Convection, Surface')
-
+plt.plot(num_for1_time, for1_T[:, -1], 'k', ls='-', lw=2, alpha=0.5, label='Numerical Forced Convection Solution')
 
 
 ### Natural Convection
@@ -277,7 +299,8 @@ def N_num_method_first(h):
 guess = 11
 
 num_ans = so.least_squares(N_num_method_first, guess, bounds = [guess-2, guess+2])
-print(num_ans.x)
+print("Numerical Solution for Natural Convection is " + str(round(float(num_ans.x), 2)) + " ± " +
+      str(0.0119))
 
 def N_num_method_final(h):
     for m in range(1, len(num_nat_time)):
@@ -294,7 +317,7 @@ def N_num_method_final(h):
 
 nat_T = N_num_method_final(num_ans.x)
 
-plt.plot(num_nat_time, nat_T[:, -1], 'r', ls='--', lw=2, alpha=0.5, label='FDM Natural Convection, Surface')
+plt.plot(num_nat_time, nat_T[:, -1], 'r', ls='-', lw=2, alpha=0.5, label='Numerical Natural Convection Solution')
 
 
 
