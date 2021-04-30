@@ -6,8 +6,8 @@ import scipy.stats as ss
 import scipy.integrate as si
 
 
-file_name = "/Users/Nguyen/Documents/ECH_145/Lab-2/data analysis/Lab2Data.xlsx"
-# file_name = "/Users/binhco/Documents/GitHub/ECH145/Lab-2/data analysis/Lab2Data.xlsx"
+# file_name = "/Users/Nguyen/Documents/ECH_145/Lab-2/data analysis/Lab2Data.xlsx"
+file_name = "/Users/binhco/Documents/GitHub/ECH145/Lab-2/data analysis/Lab2Data.xlsx"
 
 ### Natural Convection
 rawfile = pd.read_excel(file_name, "Natural Convection")
@@ -234,6 +234,8 @@ for1_ans = so.least_squares(F_num_method_first, guess, bounds = [guess-2, guess+
 print("Numerical Solution for Forced Convection is " + str(round(float(for1_ans.x), 2)) + " ± " +
       str(0.0110))
 
+numerical_for1_h = float(for1_ans.x)
+
 def F_num_method_final(h):
     for m in range(1, len(num_for1_time)):
         for i in range(1, int(diameter/(2 * dr))-1):
@@ -249,6 +251,12 @@ def F_num_method_final(h):
     return(for1_T)
 
 for1_T = F_num_method_final(for1_ans.x)
+
+for1_heat_transfer_tot = numerical_for1_h * np.pi * diameter * length * si.simps(for1_T[:, -1] -
+                                                                            for1_T_inf,
+                                                                            num_for1_time)
+
+print("Total Heat Transfer is " + str(round(for1_heat_transfer_tot, 2)))
 
 plt.figure(1)
 plt.plot(num_for1_time, for1_T[:, -1], 'k', ls='-', lw=2, alpha=0.5, label='Numerical Forced Convection Solution')
@@ -302,6 +310,7 @@ guess = 11
 num_ans = so.least_squares(N_num_method_first, guess, bounds = [guess-2, guess+2])
 print("Numerical Solution for Natural Convection is " + str(round(float(num_ans.x), 2)) + " ± " +
       str(0.0047))
+numerical_nat_h = float(num_ans.x)
 
 def N_num_method_final(h):
     for m in range(1, len(num_nat_time)):
@@ -318,8 +327,13 @@ def N_num_method_final(h):
 
 nat_T = N_num_method_final(num_ans.x)
 
-plt.plot(num_nat_time, nat_T[:, -1], 'r', ls='-', lw=2, alpha=0.5, label='Numerical Natural Convection Solution')
+nat_heat_transfer_tot = numerical_nat_h * np.pi * diameter * length * si.simps(nat_T[:, -1] -
+                                                                            nat_T_inf,
+                                                                            num_nat_time)
 
+print("Total Heat Transfer is " + str(round(nat_heat_transfer_tot, 2)))
+
+plt.plot(num_nat_time, nat_T[:, -1], 'r', ls='-', lw=2, alpha=0.5, label='Numerical Natural Convection Solution')
 
 
 step = 20
