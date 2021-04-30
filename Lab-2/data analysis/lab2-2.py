@@ -5,8 +5,8 @@ import scipy.optimize as so
 import scipy.stats as ss
 
 
-file_name = "/Users/Nguyen/Documents/ECH_145/Lab-2/data analysis/Lab2Data.xlsx"
-# file_name = "/Users/binhco/Documents/GitHub/ECH145/Lab-2/data analysis/Lab2Data.xlsx"
+# file_name = "/Users/Nguyen/Documents/ECH_145/Lab-2/data analysis/Lab2Data.xlsx"
+file_name = "/Users/binhco/Documents/GitHub/ECH145/Lab-2/data analysis/Lab2Data.xlsx"
 
 ### Forced Convection 3
 rawfile = pd.read_excel(file_name, "Forced Convection 2")
@@ -230,7 +230,7 @@ def F2_num_method_final(h):
 for2_T = F2_num_method_final(for2_ans.x)
 
 plt.figure(1)
-plt.plot(num_for2_time, for2_T[:, -1], 'b', ls='-', lw=2, alpha=0.5, label='Numerical Forced Convection 2 Solution')
+plt.plot(num_for2_time, for2_T[:, -1], 'b', ls='-', lw=2, alpha=0.5, label=f'Numerical Forced Convection (velocity = {velocity[0]}) Solution')
 
 
 #Forced Convection 3
@@ -300,7 +300,7 @@ def F3_num_method_final(h):
 
 for3_T = F3_num_method_final(for3_ans.x)
 
-plt.plot(num_for3_time, for3_T[:, -1], 'g', ls='-', lw=2, alpha=0.5, label='Numerical Forced Convection 3 Solution')
+plt.plot(num_for3_time, for3_T[:, -1], 'g', ls='-', lw=2, alpha=0.5, label=f'Numerical Forced Convection (velocity = {velocity[1]}) Solution')
 
 
 
@@ -371,7 +371,7 @@ def F4_num_method_final(h):
 
 for4_T = F4_num_method_final(for4_ans.x)
 
-plt.plot(num_for4_time, for4_T[:, -1], 'm', ls='-', lw=2, alpha=0.5, label='Numerical Forced Convection 4 Solution')
+plt.plot(num_for4_time, for4_T[:, -1], 'm', ls='-', lw=2, alpha=0.5, label=f'Numerical Forced Convection (velocity = {velocity[2]}) Solution')
 
 
 
