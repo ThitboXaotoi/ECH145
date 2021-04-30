@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import scipy.optimize as so
 import scipy.stats as ss
+import scipy.integrate as si
 
 
 file_name = "/Users/Nguyen/Documents/ECH_145/Lab-2/data analysis/Lab2Data.xlsx"
@@ -231,7 +232,7 @@ guess = 27
 
 for1_ans = so.least_squares(F_num_method_first, guess, bounds = [guess-2, guess+2])
 print("Numerical Solution for Forced Convection is " + str(round(float(for1_ans.x), 2)) + " ± " +
-      str(0.0119))
+      str(0.0110))
 
 def F_num_method_final(h):
     for m in range(1, len(num_for1_time)):
@@ -300,7 +301,7 @@ guess = 11
 
 num_ans = so.least_squares(N_num_method_first, guess, bounds = [guess-2, guess+2])
 print("Numerical Solution for Natural Convection is " + str(round(float(num_ans.x), 2)) + " ± " +
-      str(0.0119))
+      str(0.0047))
 
 def N_num_method_final(h):
     for m in range(1, len(num_nat_time)):
